@@ -81,31 +81,35 @@ export async function filterByQueryAndCategories(query, activeCategories) {
   return new Promise((resolve, reject) => {
     db.transaction(
       (tx) => {
-        // SQL statement to filter by query and categories
-        const sql =
-          'select * from menuitems where title like ? and category in (?)';
+        // Build the SQL query based on the provided criteria
+        let sqlQuery = 'SELECT * FROM menuitems';
 
-        // Execute the SQL statement
-        tx.executeSql(
-          sql,
-          [`%${query}%`, activeCategories.join("','")],
-          (_, { rows }) => {
-            const filteredItems = Array.from(rows);
+        // Add WHERE clause for the query
+        if (query) {
+          sqlQuery += ` WHERE title LIKE '%${query}%'`;
+        }
 
-            // Check if each item has a defined category property
-            const validItems = filteredItems.filter(
-              (item) => item && item.category
-            );
+        // Add AND clause for activeCategories
+        if (activeCategories.length > 0) {
+          const categoryConditions = activeCategories.map(
+            (category) => `category = '${category}'`
+          );
+          const categoryFilter = categoryConditions.join(' OR ');
+          sqlQuery += query ? ` AND (${categoryFilter})` : ` WHERE ${categoryFilter}`;
+        }
 
-            resolve(validItems);
-          },
-          (_, error) => {
-            console.error('Error while filtering data:', error);
-            reject(error);
-          }
-        );
+        // Execute the SQL query
+        tx.executeSql(sqlQuery, [], (_, { rows }) => {
+          const filteredMenuItems = rows._array;
+          resolve(filteredMenuItems);
+        });
+      },
+      (error) => {
+        console.error('Error while filtering data:', error);
+        reject(error);
       }
     );
   });
 }
+
 
