@@ -24,10 +24,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.weaam87.snackd8d527bb76324f59b8b43a9fa1b97a43"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4b357613-d781-4ba9-b20c-7cac660d4821"
+      }
     }
   }
 }
